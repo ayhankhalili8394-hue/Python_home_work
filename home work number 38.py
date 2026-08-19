@@ -1,47 +1,58 @@
 import random
 
+def print_board(player1, player2):
+    for row in range(10, 0, -1):
+        for col in range(1, 11):
+            number = (row - 1) * 10 + col
+
+            if number == player1:
+                print(" A ", end="")
+            elif number == player2:
+                print(" B ", end="")
+            else:
+                print(f"{number:3}", end="")
+
+            print("|", end="")
+
+        print()
+        print("-" * 40)
+
+
 player1 = 0
 player2 = 0
-turn = 1
-
-print("Snake and Ladder Game")
-print("First player to reach 100 wins!\n")
 
 while True:
-    print("-" * 40)
 
-    if turn == 1:
-        input("Player 1 - Press Enter to roll the dice...")
-        dice = random.randint(1, 6)
-        print("Player 1 rolled:", dice)
+    print_board(player1, player2)
 
-        if player1 + dice <= 100:
-            player1 += dice
-        else:
-            print("Player 1 must roll the exact number to reach 100.")
+    input("Player A - Press Enter to roll the dice...")
+    dice = random.randint(1, 6)
 
-        if player1 == 100:
-            print("\nPlayer 1 Wins!")
-            break
+    print("Player A rolled:", dice)
 
-        turn = 2
-
+    if player1 + dice <= 100:
+        player1 = player1 + dice
     else:
-        input("Player 2 - Press Enter to roll the dice...")
-        dice = random.randint(1, 6)
-        print("Player 2 rolled:", dice)
+        print("Too far! Player A stays in the same place.")
 
-        if player2 + dice <= 100:
-            player2 += dice
-        else:
-            print("Player 2 must roll the exact number to reach 100.")
+    if player1 == 100:
+        print_board(player1, player2)
+        print("Player A wins!")
+        break
 
-        if player2 == 100:
-            print("\nPlayer 2 Wins!")
-            break
+    print_board(player1, player2)
 
-        turn = 1
+    input("Player B - Press Enter to roll the dice...")
+    dice = random.randint(1, 6)
 
-    print("\nCurrent Board:")
-    print("Player 1 is on square", player1)
-    print("Player 2 is on square", player2)
+    print("Player B rolled:", dice)
+
+    if player2 + dice <= 100:
+        player2 = player2 + dice
+    else:
+        print("Too far! Player B stays in the same place.")
+
+    if player2 == 100:
+        print_board(player1, player2)
+        print("Player B wins!")
+        break
