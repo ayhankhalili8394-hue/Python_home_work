@@ -1,0 +1,78 @@
+
+import random
+
+players = []
+roles = [
+    "Werewolf",
+    "Werewolf",
+    "Werewolf",
+    "Werewolf",
+    "Villager",
+    "Villager",
+    "Villager",
+    "Villager",
+    "Villager",
+    "Villager",
+    "Villager",
+    "Seer",
+    "Doctor",
+    "Hunter",
+    "Hunter"
+]
+
+random.shuffle(roles)
+
+print("WEREWOLF - 15 PLAYERS")
+
+for i in range(15):
+    name = input("Enter the name of player " + str(i + 1) + ": ")
+
+    player = {
+        "name": name,
+        "role": roles[i],
+        "alive": True,
+        "power_used": False,
+        "last_protected": False
+    }
+
+    players.append(player)
+
+print()
+print("All players have joined the game!")
+input("Press Enter to begin the role reveal...")
+
+
+for player in players:
+    print("\n" * 40)
+    print("Pass the computer to:", player["name"])
+    input("Press Enter when you are ready to see your role...")
+
+    print("\n" * 40)
+    print("Your name:", player["name"])
+    print("Your secret role:", player["role"])
+
+    if player["role"] == "Werewolf":
+        print("Your team is the Werewolves.")
+        print("Find and eliminate the villagers!")
+
+    elif player["role"] == "Villager":
+        print("Your team is the Village.")
+        print("Find the werewolves and vote them out!")
+
+    elif player["role"] == "Seer":
+        print("Your team is the Village.")
+        print("You can investigate one player each night.")
+
+    elif player["role"] == "Doctor":
+        print("Your team is the Village.")
+        print("You can protect one player each night.")
+
+    elif player["role"] == "Hunter":
+        print("Your team is the Village.")
+        print("When eliminated, you can take another player with you.")
+
+    input("\nMemorize your role, then press Enter to hide it.")
+
+print("\n" * 40)
+print("Everyone has received their secret role!")
+print("The game is ready to begin.")
