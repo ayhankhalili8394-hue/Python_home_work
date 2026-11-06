@@ -1,3 +1,4 @@
+
 import random
 
 
@@ -49,9 +50,9 @@ def make_player_names():
 def choose_player_name():
     players = make_player_names()
 
-    print("WEREWOLF: YOU VS 14 ROBOTS")
+    print("WEREWOLF: YOU VS. 14 ROBOTS")
     print()
-    print("The computer randomly generated these 15 names:\n")
+    print("The computer generated these 15 names:\n")
 
     for name in players:
         print(name)
@@ -69,7 +70,7 @@ def choose_player_name():
     print("You are playing as " + user_name + ".")
     print("The other 14 players are computer-controlled robots.")
 
-    input("Press Enter to assign the secret roles.")
+    input("\nPress Enter to assign the secret roles.")
 
     return players, user_name
 
@@ -78,8 +79,7 @@ def assign_roles(players):
     role_list = (
         ["Werewolf"] * 4
         + ["Villager"] * 7
-        + ["Seer"]
-        + ["Doctor"]
+        + ["Seer", "Doctor"]
         + ["Hunter"] * 2
     )
 
@@ -112,7 +112,8 @@ def reveal_user_role(user_name, roles, players):
         print("Your Werewolf teammates are:")
         print(", ".join(teammates))
         print()
-        print("At night, choose someone to attack.")
+        print("You and your teammates must eliminate")
+        print("the other players without being discovered.")
 
     elif roles[user_name] == "Villager":
         print("You are a Villager.")
@@ -133,7 +134,7 @@ def reveal_user_role(user_name, roles, players):
         print("When eliminated, you may eliminate")
         print("one living player with you.")
 
-    input("\nMemorize your role. Press Enter to start the game.")
+    input("\nMemorize your role. Press Enter to start.")
 
     hide_screen()
 
@@ -239,45 +240,68 @@ def night_phase(alive, roles, user_name, last_protected, suspicions):
         if roles[player] != "Werewolf"
     ]
 
-    wolf_votes = []
+    wolf_votes = {}
 
-    for wolf in living_wolves:
+    if living_wolves and possible_targets:
+        for wolf in living_wolves:
 
-        if wolf == user_name:
-            print("You are a Werewolf.")
-            print("Choose someone to attack tonight.")
+            if wolf == user_name:
+                print("You are a Werewolf.")
+                print("Choose someone to attack tonight.")
 
-            target = choose_from_list(
-                "Choose your target: ",
-                possible_targets
+                target = choose_from_list(
+                    "Choose your target: ",
+                    possible_targets
+                )
+
+            else:
+                target = random.choice(possible_targets)
+
+                if roles[user_name] == "Werewolf":
+                    print(
+                        "Your teammate " + wolf
+                        + " voted to attack " + target + "."
+                    )
+
+            if target is not None:
+                wolf_votes[wolf] = target
+
+        if roles[user_name] == "Werewolf":
+            print()
+            print("YOUR TEAM'S NIGHT VOTES")
+            print()
+
+            for wolf, target in wolf_votes.items():
+                if wolf == user_name:
+                    print("You voted to attack " + target + ".")
+                else:
+                    print(wolf + " voted to attack " + target + ".")
+
+        target_counts = {}
+
+        for target in wolf_votes.values():
+            target_counts[target] = (
+                target_counts.get(target, 0) + 1
             )
 
-        else:
-            target = random.choice(possible_targets)
-
-        if target is not None:
-            wolf_votes.append(target)
-
-    wolf_target = None
-
-    if wolf_votes:
-        vote_counts = {}
-
-        for target in wolf_votes:
-            vote_counts[target] = vote_counts.get(target, 0) + 1
-
-        highest = max(vote_counts.values())
+        highest = max(target_counts.values())
 
         leaders = [
-            target for target in vote_counts
-            if vote_counts[target] == highest
+            target for target in target_counts
+            if target_counts[target] == highest
         ]
 
         wolf_target = random.choice(leaders)
 
+        print()
+        print("The Werewolves' final target is " + wolf_target + ".")
+
         if len(leaders) > 1:
             print("The Werewolves tied their votes.")
             print("A tied target was chosen randomly.")
+
+    else:
+        wolf_target = None
 
     protected = None
 
@@ -295,7 +319,6 @@ def night_phase(alive, roles, user_name, last_protected, suspicions):
         ]
 
         if doctor_choices:
-
             if doctor == user_name:
                 print()
                 print("You are the Doctor.")
@@ -308,6 +331,9 @@ def night_phase(alive, roles, user_name, last_protected, suspicions):
 
             else:
                 protected = random.choice(doctor_choices)
+
+                if roles[user_name] == "Doctor":
+                    print("The Doctor has chosen someone to protect.")
 
             last_protected = protected
 
@@ -325,7 +351,6 @@ def night_phase(alive, roles, user_name, last_protected, suspicions):
         ]
 
         if seer_choices:
-
             if seer == user_name:
                 print()
                 print("You are the Seer.")
@@ -354,6 +379,7 @@ def night_phase(alive, roles, user_name, last_protected, suspicions):
                     suspicions[checked] += 4
 
     if wolf_target is None:
+        print("Morning arrives!")
         print("Nobody was attacked tonight.")
 
     elif wolf_target == protected:
@@ -384,7 +410,6 @@ def collect_votes(alive, allowed_targets, roles, user_name, suspicions):
     vote_counts = {}
 
     for voter in alive.copy():
-
         choices = [
             target for target in allowed_targets
             if target != voter
@@ -411,7 +436,9 @@ def collect_votes(alive, allowed_targets, roles, user_name, suspicions):
             )
 
         if vote is not None:
-            vote_counts[vote] = vote_counts.get(vote, 0) + 1
+            vote_counts[vote] = (
+                vote_counts.get(vote, 0) + 1
+            )
 
     return vote_counts
 
@@ -532,6 +559,8 @@ def day_phase(alive, roles, user_name, suspicions):
 
         input("Press Enter to continue.")
 
+        hide_screen()
+
 
 def show_final_result(winner, players, roles, alive, user_name):
     hide_screen()
@@ -584,7 +613,6 @@ def main():
     reveal_user_role(user_name, roles, players)
 
     while True:
-
         winner = check_winner(alive, roles)
 
         if winner is not None:
